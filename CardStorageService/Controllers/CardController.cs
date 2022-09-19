@@ -14,8 +14,10 @@ namespace CardStorageService.Controllers
             logger = Logger;
         }
 
+        [HttpGet("getAll")]
         public IActionResult GetByClientId(string clientId)
         {
+            logger.LogInformation("Request id:" + clientId);
             return Ok();
         }
 
