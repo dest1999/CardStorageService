@@ -1,3 +1,5 @@
+using CardStorageService.Data;
+using Microsoft.EntityFrameworkCore;
 using NLog.Web;
 
 namespace CardStorageService
@@ -24,6 +26,11 @@ namespace CardStorageService
             }).UseNLog(new NLogAspNetCoreOptions() { RemoveLoggerFactoryFilter = true });
 
             // Add services to the container.
+
+            builder.Services.AddDbContext<CardStorageServiceDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration["Settings:DatabaseOptions:ConnectionString"]);
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
