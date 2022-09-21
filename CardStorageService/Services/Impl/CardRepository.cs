@@ -1,4 +1,6 @@
 ﻿using CardStorageService.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CardStorageService.Services.Impl
 {
@@ -13,39 +15,43 @@ namespace CardStorageService.Services.Impl
             logger = Logger;
         }
 
-        public int Create(Card data)
+        public string Create(Card data)
         {
-            throw new NotImplementedException();
-        }
+            var client = context.Clients.FirstOrDefault(client => client.ClientId == data.ClientId);
+            if (client == null)
+                throw new Exception("Client not found.");
+            context.Cards.Add(data);
 
-        public int Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
+            context.SaveChanges();
 
-        public IList<Card> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<Card> GetByClientId(int id)
-        {
-            throw new NotImplementedException();
+            return data.CardId.ToString();
         }
 
         public IList<Card> GetByClientId(string id)
         {
-            throw new NotImplementedException();
+            List<Card> cards = context.Cards.Where(c => c.ClientId.ToString() == id).ToList();
+
+            return cards;
+
         }
 
-        public Card GetById(int id)
+        public int Delete(string id)
         {
             throw new NotImplementedException();
         }
-
+        public IList<Card> GetAll()
+        {
+            throw new NotImplementedException();
+        }
         public int Update(Card data)
         {
             throw new NotImplementedException();
         }
+        public Card GetById(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }

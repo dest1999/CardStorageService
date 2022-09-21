@@ -15,7 +15,9 @@ namespace CardStorageService.Services.Impl
 
         public int Create(Client data)
         {
-            throw new NotImplementedException();
+            context.Clients.Add(data);
+            context.SaveChanges();
+            return data.ClientId;
         }
 
         public int Delete(int id)
