@@ -33,6 +33,11 @@ namespace CardStorageService.Services.Impl
             throw new NotImplementedException();
         }
 
+        public IList<Card> GetByClientId(string id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Card GetById(int id)
         {
             throw new NotImplementedException();
