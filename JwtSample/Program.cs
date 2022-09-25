@@ -16,8 +16,7 @@ namespace JwtSample
             string userPassword = Console.ReadLine();
 
             UserService userService = new();
-            string token = userService.Authenticate(userName,
-            userPassword);
+            string token = userService.Authenticate(userName, userPassword);
             Console.WriteLine(token);
             Console.ReadKey(true);
         }
@@ -26,60 +25,37 @@ namespace JwtSample
         internal class UserService
         {
 
-            private const string secret = "kYp3s6v9y/B?E(H+";
+            private const string secret = "superSecretKeyValue";
 
             private IDictionary<string, string> _users = new Dictionary<string, string>()
-        {
-            {"root1", "test"}, // 0
-            {"root2", "test"}, // 1
-            {"root3", "test"}, // 2
-            {"root4", "test"}  // 3
-        };
+            {
+                {"root1", "test1"},
+                {"root2", "test2"},
+                {"root3", "test3"},
+                {"root4", "test4"}
+            };
 
             public string Authenticate(string user, string password)
             {
-                if (string.IsNullOrWhiteSpace(user) ||
-                    string.IsNullOrWhiteSpace(password))
+                if (!string.IsNullOrWhiteSpace(user) ||
+                    !string.IsNullOrWhiteSpace(password))
                 {
-                    return string.Empty;
-                }
-
-                int i = 0;
-                foreach (KeyValuePair<string, string> pair in _users)
-                {
-                    if (string.CompareOrdinal(pair.Key, user) == 0 &&
-                    string.CompareOrdinal(pair.Value, password) == 0)
+                    int i = 0;
+                    foreach (KeyValuePair<string, string> pair in _users)
                     {
-
-                        return GenerateToken(i);
-
+                        if (string.CompareOrdinal(pair.Key, user) == 0 &&
+                        string.CompareOrdinal(pair.Value, password) == 0)
+                        {
+                            return GenerateToken(i);
+                        }
+                        i++;
                     }
-
-                    i++;
-
                 }
 
-                return String.Empty;
-
+                return string.Empty;
             }
 
-            private string GenerateToken(int id)
-            {
-                JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-                byte[] key = Encoding.ASCII.GetBytes(secret);
-
-
-                SecurityTokenDescriptor securityTokenDescriptor = new SecurityTokenDescriptor();
-                securityTokenDescriptor.Expires = DateTime.UtcNow.AddMinutes(15);
-                securityTokenDescriptor.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
-                securityTokenDescriptor.Subject = new System.Security.Claims.ClaimsIdentity(new Claim[] {
-                new Claim(ClaimTypes.NameIdentifier, id.ToString())
-            });
-
-                SecurityToken securityToken = jwtSecurityTokenHandler.CreateToken(securityTokenDescriptor);
-                return jwtSecurityTokenHandler.WriteToken(securityToken);
-            }
-            private string GeneratetToken(int id)
+            private static string GenerateToken(int id)
             {
                 JwtSecurityTokenHandler jwtSecurityTokenHandler = new();
                 byte[] key = Encoding.ASCII.GetBytes(secret);
