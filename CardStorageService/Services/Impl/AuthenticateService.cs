@@ -12,10 +12,11 @@ namespace CardStorageService.Services.Impl
 {
     public class AuthenticateService : IAuthenticateService
     {
-        private readonly string secretKey = "12313265165165";
         private readonly IServiceScopeFactory scopeFactory;
 
         private readonly Dictionary<string, SessionInfo> sessions = new();
+
+        public const string SecretKey = "12313265165165";
 
         public AuthenticateService(IServiceScopeFactory ScopeFactory)
         {
@@ -65,6 +66,43 @@ namespace CardStorageService.Services.Impl
             };
         }
 
+        public SessionInfo GetSessionInfo(string sessionToken)
+        {
+            SessionInfo sessionInfo;
+
+            lock (sessions)
+            {
+                sessions.TryGetValue(sessionToken, out sessionInfo);
+            }
+
+            if (sessionInfo == null)
+            {
+                using IServiceScope scope = scopeFactory.CreateScope();
+                CardStorageServiceDbContext context = scope.ServiceProvider.GetRequiredService<CardStorageServiceDbContext>();
+
+                AccountSession session = context.AccountSessions.FirstOrDefault(s => s.SessionToken == sessionToken);
+
+                if (session == null)
+                {
+                    return null;
+                }
+
+                Account account = context.Accounts.FirstOrDefault(acc => acc.AccountId == session.AccountId);
+                sessionInfo = GetSessionInfo(account, session);
+
+                if (sessionInfo != null)
+                {
+                    lock (sessions)
+                    {
+                        sessions[sessionToken] = sessionInfo;
+                    }
+                }
+
+            }
+
+            return sessionInfo;
+
+        }
 
 
         private SessionInfo GetSessionInfo(Account account, AccountSession accountSession)
@@ -88,7 +126,7 @@ namespace CardStorageService.Services.Impl
         private string CreateSessionToken(Account account)
         {
             JwtSecurityTokenHandler tokenHandler = new();
-            byte[] key = Encoding.ASCII.GetBytes(secretKey);
+            byte[] key = Encoding.ASCII.GetBytes(SecretKey);
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(
@@ -112,10 +150,6 @@ namespace CardStorageService.Services.Impl
             return context.Accounts.FirstOrDefault(acc => acc.EMail == login);
         }
 
-        public SessionInfo GetSessionInfo(string sessionToken)
-        {
-            throw new NotImplementedException();
-        }
 
     }
 }
