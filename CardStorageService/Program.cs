@@ -12,6 +12,8 @@ using Microsoft.OpenApi.Models;
 using FluentValidation;
 using CardStorageService.Models.Requests;
 using CardStorageService.Models.Validators;
+using AutoMapper;
+using CardStorageService.Mappings;
 
 namespace CardStorageService
 {
@@ -23,6 +25,10 @@ namespace CardStorageService
 
             builder.Services.AddScoped<IValidator<AuthenticationRequest>, AuthenticationRequestValidator>();
             builder.Services.AddScoped<IValidator<CreateClientRequest>, CreateClientRequestValidator>();
+
+            var mapperConfiguration = new MapperConfiguration(mp => mp.AddProfile(new MappingsProfile()));
+            var mapper = mapperConfiguration.CreateMapper();
+            builder.Services.AddSingleton(mapper);
 
             builder.Services.AddHttpLogging(logging =>
             {
