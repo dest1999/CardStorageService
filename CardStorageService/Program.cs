@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using FluentValidation;
+using CardStorageService.Models.Requests;
+using CardStorageService.Models.Validators;
 
 namespace CardStorageService
 {
@@ -17,6 +20,9 @@ namespace CardStorageService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddScoped<IValidator<AuthenticationRequest>, AuthenticationRequestValidator>();
+            builder.Services.AddScoped<IValidator<CreateClientRequest>, CreateClientRequestValidator>();
 
             builder.Services.AddHttpLogging(logging =>
             {

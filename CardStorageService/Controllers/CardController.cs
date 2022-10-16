@@ -55,6 +55,11 @@ namespace CardStorageService.Controllers
         [ProducesResponseType(typeof(GetCardsResponse), StatusCodes.Status200OK)]
         public IActionResult GetByClientId([FromQuery] string clientId)
         {
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                return BadRequest();
+            }
+
             try
             {
                 var cards = cardRepositoryService.GetByClientId(clientId);
