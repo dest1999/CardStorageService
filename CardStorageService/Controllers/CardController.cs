@@ -1,21 +1,26 @@
-﻿using CardStorageService.Data;
+﻿using AutoMapper;
+using CardStorageService.Data;
 using CardStorageService.Models;
 using CardStorageService.Models.Requests;
 using CardStorageService.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CardStorageService.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CardController : ControllerBase
     {
         private readonly ILogger<CardController> logger;
         private readonly ICardRepositoryService cardRepositoryService;
+        private readonly IMapper mapper;
 
-        public CardController(ILogger<CardController> Logger, ICardRepositoryService CardRepositoryService)
+        public CardController(ILogger<CardController> Logger, ICardRepositoryService CardRepositoryService, IMapper Mapper)
         {
+            mapper = Mapper;
             logger = Logger;
             cardRepositoryService = CardRepositoryService;
         }
@@ -26,13 +31,7 @@ namespace CardStorageService.Controllers
         {
             try
             {
-                var cardId = cardRepositoryService.Create(new Card
-                {
-                    ClientId = request.ClientId,
-                    CardNo = request.CardNo,
-                    ExpDate = request.ExpDate,
-                    CVV2 = request.CVV2
-                });
+                var cardId = cardRepositoryService.Create(mapper.Map<Card>(request));
                 return Ok(new CreateCardResponse
                 {
                     CardId = cardId.ToString()
@@ -53,18 +52,17 @@ namespace CardStorageService.Controllers
         [ProducesResponseType(typeof(GetCardsResponse), StatusCodes.Status200OK)]
         public IActionResult GetByClientId([FromQuery] string clientId)
         {
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                return BadRequest();
+            }
+
             try
             {
                 var cards = cardRepositoryService.GetByClientId(clientId);
                 return Ok(new GetCardsResponse
                 {
-                    Cards = cards.Select(card => new CardDTO
-                    {
-                        CardNo = card.CardNo,
-                        CVV2 = card.CVV2,
-                        Name = card.Name,
-                        ExpDate = card.ExpDate.ToString("MM/yy")
-                    }).ToList()
+                    Cards = mapper.Map<List<CardDTO>>(cards)
                 });
             }
             catch (Exception e)
