@@ -130,7 +130,15 @@ namespace CardStorageService
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHttpLogging();
+            
+            app.UseWhen(x => x.Request.ContentType != "application/grpc",
+                builder =>
+                {
+                    builder.UseHttpLogging();
+                }
+            );
+
+            //app.UseHttpLogging();
 
             app.MapControllers();
             #region gRPC
