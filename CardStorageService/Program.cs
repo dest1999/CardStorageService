@@ -14,6 +14,7 @@ using CardStorageService.Models.Requests;
 using CardStorageService.Models.Validators;
 using AutoMapper;
 using CardStorageService.Mappings;
+using System.Net;
 
 namespace CardStorageService
 {
@@ -22,6 +23,17 @@ namespace CardStorageService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            #region gRPC
+            builder.WebHost.ConfigureKestrel(opt =>
+            {
+                opt.Listen(IPAddress.Any, 5001, listenOpt =>
+                {
+                    listenOpt.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+                });
+            });
+            builder.Services.AddGrpc();
+            #endregion
 
             builder.Services.AddScoped<IValidator<AuthenticationRequest>, AuthenticationRequestValidator>();
             builder.Services.AddScoped<IValidator<CreateClientRequest>, CreateClientRequestValidator>();
@@ -121,6 +133,14 @@ namespace CardStorageService
             app.UseHttpLogging();
 
             app.MapControllers();
+            #region gRPC
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<Client>();
+                endpoints.MapGrpcService<CardService>();
+
+            });
+            #endregion
 
             app.Run();
         }

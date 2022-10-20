@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtSample", "JwtSample\JwtS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{E2CC41AF-BA67-4655-A803-96A756585DDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsSecureSettings", "ConsSecureSettings\ConsSecureSettings.csproj", "{51418A31-4E5A-4556-9129-2662CD02AC2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsSecureSettings", "ConsSecureSettings\ConsSecureSettings.csproj", "{51418A31-4E5A-4556-9129-2662CD02AC2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
