@@ -139,6 +139,15 @@ namespace CardStorageService
             //);
 
             app.UseHttpLogging();
+            
+            app.UseWhen(x => x.Request.ContentType != "application/grpc",
+                builder =>
+                {
+                    builder.UseHttpLogging();
+                }
+            );
+
+            //app.UseHttpLogging();
 
             app.MapControllers();
             #region gRPC
